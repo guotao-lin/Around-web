@@ -2,6 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 import { Tabs, Button, Spin } from 'antd';
 import { GEO_OPTIONS, POS_KEY, AUTH_PREFIX, TOKEN_KEY, API_ROOT } from '../constants';
+import { Gallery } from './Gallery';
 
 const TabPane = Tabs.TabPane;
 const operations = <Button>Extra Action</Button>;
@@ -46,6 +47,23 @@ export class Home extends React.Component {
         return <Spin tip="Loading geo location ..."/>;
       } else if (this.state.loadingPosts) {
         return <Spin tip='Loading posts ...'/>;
+      } else if (this.state.posts.length > 0) {
+        const images = this.state.posts.map((post) => {
+          return {
+           user: post.user,
+           src: post.url,
+           thumbnail: post.url,
+           thumbnailWidth: 400,
+           thumbnailHeight: 300,
+           caption: post.message,
+         };
+        });
+
+        return (
+          <Gallery
+            images={images}
+          />
+        );
       }
       return null;
     }
@@ -54,7 +72,7 @@ export class Home extends React.Component {
       //const { lat, lon } = JSON.parse(localStorage.getItem(POS_KEY));
       const { lat, lon } = { "lat":37.5629917,"lon":-122.32552539999998 };
       this.setState({ loadingPosts: true });
-      return $.ajax({
+      $.ajax({
            url: `${API_ROOT}/search?lat=${lat}&lon=${lon}&range=20`,
            method: 'GET',
            headers: {
